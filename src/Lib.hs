@@ -5,7 +5,7 @@
 
 -- You should have received a copy of the license along with this
 -- work. If not, see <http://creativecommons.org/licenses/by/4.0/>.
- 
+
 -- v1.0-b.1
 module Lib where
 
@@ -54,8 +54,19 @@ step (src, dst) = do
   disk <- pop src
   push disk dst
 
-optStrategy :: Int -> Move -> Move -> State Conf [(Move, Conf)]
-optStrategy = undefined
+{-| Computes the optimal sequence of moves to solve the Hanoi tower problem -}
+optStrategy :: Int -> Move -> State Conf [(Move, Conf)]
+optStrategy 1 move = do 
+  conf <- step move
+  return [(move, conf)]
+optStrategy disks (src, dst) = do 
+  mv1 <- optStrategy (disks - 1) (src, spare)
+  mv2 <- optStrategy 1 (src, dst)
+  mv3 <- optStrategy (disks - 1) (spare, dst)
+  return $ mv1 ++ mv2 ++ mv3
+ where
+  spare =
+    if src == L || dst == L then if src == C || dst == C then R else C else L
 
 play :: Int -> Peg -> Peg -> IO ()
 play = undefined
